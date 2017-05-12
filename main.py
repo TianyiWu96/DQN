@@ -1,16 +1,27 @@
 import os
-from players.half_pong_player import HalfPongPlayer
 from argparse import ArgumentParser, ArgumentTypeError
 
+# Import players
+from players.pong_player import PongPlayer
+from players.half_pong_player import HalfPongPlayer
+from players.tetris_player import TetrisPlayer
+
 def main():
-    args = parse_args()
+    games = ("pong", "half_pong", "tetris")
+    args = parse_args(games)
 
     # Make data directories.
     for path in (args.data_path, args.weight_save_path, args.log_path):
         if not os.path.exists(os.path.dirname(path)):
             os.mkdir(os.path.dirname(path))
     
-    player = HalfPongPlayer
+    players = {
+        "pong": PongPlayer,
+        "half_pong": HalfPongPlayer,
+        "tetris": TetrisPlayer
+    }
+
+    player = players[args.game]
 
     # Construct player and start playing.
     player(weight_save_path=args.weight_save_path,
@@ -34,8 +45,12 @@ def main():
         pooling=args.pooling,
         training=args.training).start()
 
-def parse_args():
+def parse_args(games):
     parser = ArgumentParser()
+    parser.add_argument("--game",
+        help="which game to play: " + str(games),
+        metavar="<GAME>",
+        default="pong")
     parser.add_argument("--data_path", 
         help="path for data like images, logs, weights", 
         metavar="<DATA_PATH>",
