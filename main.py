@@ -7,7 +7,6 @@ def main():
 
     # Make data directories.
     for path in (args.data_path, args.weight_save_path, args.log_path):
-        print(path)
         if not os.path.exists(os.path.dirname(path)):
             os.mkdir(os.path.dirname(path))
     
@@ -62,12 +61,12 @@ def parse_args():
         help="log frequency: int",
         metavar="<LOG_FREQUENCY>",
         type=int,
-        default=int(1e4))
+        default=int(1e3))
     parser.add_argument("--update_frequency", 
         help="update frequency: int",
         metavar="<UPDATE_FREQUENCY>",
         type=int,
-        default=1)
+        default=4)
     parser.add_argument("--batch_size", 
         help="batch size: int",
         metavar="<BATCH_SIZE>",
@@ -107,7 +106,7 @@ def parse_args():
         help="number of frame to repeat each action for: int",
         metavar="<ACTION_REPEAT>",
         type=int,
-        default=4)
+        default=1)
     parser.add_argument("--state_frames", 
         help="number of frames in each state: int",
         metavar="<STATE_FRAMES>",

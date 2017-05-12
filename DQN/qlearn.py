@@ -1,11 +1,11 @@
 """Interfaces for Deep Q-Network."""
-from collections import deque
 import random
-import os
-from DQN.qnet import QNet
 import numpy as np
-from scipy.misc import imresize
 import tensorflow as tf
+from collections import deque
+from scipy.misc import imresize
+
+from DQN.qnet import QNet
 
 
 class DeepQLearner(object):
@@ -41,12 +41,8 @@ class DeepQLearner(object):
             restore: If true, will restore weights right away from checkpoint_path.
         """
 
-        # Initialize state variables.
+        # Save allowed actions.
         self.actions = actions
-        self.net = QNet(len(actions), learning_rate)
-        self.iteration = -1
-        self.actions_taken = 0
-        self.repeating_action_rewards = 0
 
         # Handle network save/restore.
         self.weight_save_path = weight_save_path
@@ -77,6 +73,16 @@ class DeepQLearner(object):
         self.dueling = dueling
         self.pooling = pooling
         self.training = training
+
+
+        # Initialize variables.
+        self.iteration = -1
+        self.actions_taken = 0
+        self.repeating_action_rewards = 0
+        self.update_count = 0
+
+        # Create network.
+        self.net = QNet(len(actions), self.learning_rate)
 
         # Store all previous transitions in a deque to allow for efficient
         # popping from the front and to allow for size management.
@@ -134,8 +140,7 @@ class DeepQLearner(object):
         self.transitions.append({
             'state_in': pre_frame,
             'action': self.actions.index(action),
-            'terminal': terminal
-        })
+            'terminal': terminal})
 
     def __observe_result(self, resulting_state, reward):
         """Records the resulting state and reward from the previous action.
@@ -159,7 +164,6 @@ class DeepQLearner(object):
         Decays the exploration rate if the final exploration frame has not been reached.
         """
         if not self.__is_burning_in() and self.exploration_rate > self.exploration_end_rate:
-            # TODO: This is an ugly fix. Find the source of this problem.
             self.exploration_rate = max(self.exploration_end_rate, (self.exploration_duration - self.iteration / self.update_frequency / self.action_repeat) / (self.exploration_duration))
         return random.random() < self.exploration_rate or self.__is_burning_in()
 
@@ -217,18 +221,20 @@ class DeepQLearner(object):
         proc_frame = self.__preprocess(frame)
         self.__observe_result(proc_frame, self.repeating_action_rewards)
 
-        # Save network if necessary before updating.
-        if self.weight_save_path and self.iteration % self.weight_save_frequency == 0 and self.iteration > 0:
-            self.__save()
+        if self.training:
+            # Save network if necessary before updating.
+            if self.weight_save_path and self.iteration % self.weight_save_frequency == 0 and self.iteration > 0:
+                self.__save()
 
-        # If not burning in, update the network.
-        if not self.__is_burning_in() and self.actions_taken % self.update_frequency == 0:
-            # Update network from the previous action.
-            minibatch = random.sample(self.transitions, self.batch_size)
-            batch_frames = [trans['state_in'] for trans in minibatch]
-            batch_actions = [trans['action'] for trans in minibatch]
-            batch_targets = [self.__compute_target_reward(trans) for trans in minibatch]
-            self.net.update(batch_frames, batch_actions, batch_targets)
+            # If not burning in, update the network.
+            if not self.__is_burning_in() and self.actions_taken % self.update_frequency == 0:
+                self.update_count += 1
+                # Update network from the previous action.
+                minibatch = random.sample(self.transitions, self.batch_size)
+                batch_frames = [trans['state_in'] for trans in minibatch]
+                batch_actions = [trans['action'] for trans in minibatch]
+                batch_targets = [self.__compute_target_reward(trans) for trans in minibatch]
+                self.net.update(batch_frames, batch_actions, batch_targets)
 
         # Select the next action.
         action = self.__random_action() if self.do_explore() else self.__best_action(proc_frame)
@@ -257,24 +263,29 @@ class DeepQLearner(object):
             print('        Sample Q output:', self.net.compute_q(self.transitions[-1]['state_in']))
 
         if score_ratio:
-            print('        Score ratio: %0.9f' % score_ratio)
+            print('        Score ratio: %0.20f' % score_ratio)
             
-        print('===============================================================')
+        print('==============================================================================')
         open(self.log_path, "a").write(str(score_ratio) + '\n')
 
     def __save(self):
         """Save the current network parameters in the checkpoint path."""
-        if not os.path.exists(os.path.dirname(self.weight_save_path)):
-            os.makedirs(os.path.dirname(self.weight_save_path))
         self.net.saver.save(self.net.sess, self.weight_save_path, global_step=self.iteration)
 
     def __restore(self):
         """Restore the network from the checkpoint path."""
         if not os.path.exists(self.weight_restore_path):
             raise Exception('No such checkpoint path %s!' % self.weight_restore_path)
-        model_path = tf.train.get_checkpoint_state(self.weight_restore_path).model_checkpoint_path
-        self.iteration = int(model_path[(model_path.rfind('-')+1):]) - 1
-        # set exploration rate
-        self.exploration_rate = max(EXPLORATION_END_RATE, burn_in_duration_RATE - self.exploration_reduction * self.iteration / 4)
-        self.net.saver.restore(self.net.sess, model_path)
+
+        # Get path to weights.
+        path = tf.train.get_checkpoint_state(self.weight_restore_path).model_checkpoint_path
+        
+        # Restore iteration number.
+        self.iteration = int(path[(path.rfind('-')+1):]) - 1
+
+        # Restore exploration rate.
+        self.exploration_rate = max(self.exploration_end_rate, (self.exploration_duration - self.iteration / self.update_frequency / self.action_repeat) / (self.exploration_duration))
+
+        # Restore network weights.
+        self.net.saver.restore(self.net.sess, path)
         print("Network weights, exploration rate, and iteration number restored!")
