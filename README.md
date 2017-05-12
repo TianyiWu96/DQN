@@ -6,7 +6,7 @@ tensorflow-gpu, scipy, numpy
 
 
 ### Usage
-
+```
 usage: main.py [-h] [--game GAME] [--data_path DATA_PATH]
                [--weight_save_path WEIGHT_SAVE_PATH]
                [--weight_restore_path WEIGHT_RESTORE_PATH]
@@ -23,8 +23,10 @@ usage: main.py [-h] [--game GAME] [--data_path DATA_PATH]
                [--state_frames STATE_FRAMES] [--frame_height FRAME_HEIGHT]
                [--frame_width FRAME_WIDTH] [--dueling DUELING]
                [--pooling POOLING] [--training TRAINING]
+```
 
 optional arguments:
+```
   -h, --help            show this help message and exit
   --game GAME           which game to play: ('pong', 'half_pong', 'tetris')
   --data_path DATA_PATH
@@ -66,3 +68,4 @@ optional arguments:
   --dueling DUELING     use dueling architecture: bool
   --pooling POOLING     use pooling architecture: bool
   --training TRAINING   train network: bool
+```
