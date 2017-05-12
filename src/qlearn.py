@@ -280,22 +280,27 @@ class DeepQLearner(object):
         Args:
             score_ratio: Score ratio given by the PyGamePlayer.
         """
-        print('        Iteration: %d' % self.iteration)
+        print('        Iteration       : %d' % self.iteration)
+
+        if self.update_count > 0:
+            print('        Update count    : %d' % self.update_count)
 
         if self.__is_burning_in() or len(self.transitions) < self.replay_max_size:
-            print('        Replay capacity: %d (burn in %s)' % (len(self.transitions), 'not done' if self.__is_burning_in() else 'done'))
+            print('        Replay capacity : %d' % len(self.transitions))
 
         if self.exploration_rate > self.exploration_end_rate and not self.__is_burning_in():
-            print('        Exploration rate: %0.9f (%s annealing)' % (self.exploration_rate, 'not' if self.__is_burning_in() else 'still'))
+            print('        Exploration rate: %0.20f' % self.exploration_rate)
 
         # If we're using the network, print a sample of the output.
         if not self.__is_burning_in():
-            print('        Sample Q output:', self.net.compute_q(self.transitions[-1]['state_in']))
+            print('        Sample Q output :', self.net.compute_q(self.transitions[-1]['state_in']))
 
         if score_ratio:
-            print('        Score ratio: %0.20f' % score_ratio)
+            print('        Score ratio     : %0.20f' % score_ratio)
             
         print('==============================================================================')
+
+        # Write to log file.
         open(self.log_path, "a").write(str(score_ratio) + '\n')
 
     def __save(self):
