@@ -22,9 +22,9 @@ def main():
         update_frequency=args.update_frequency,
         batch_size=args.batch_size,
         learning_rate=args.learning_rate,
+        burn_in_duration=args.burn_in_duration,
         exploration_duration=args.exploration_duration,
         exploration_end_rate=args.exploration_end_rate,
-        replay_start_size=args.replay_start_size,
         replay_max_size=args.replay_max_size,
         discount=args.discount,
         action_repeat=args.action_repeat,
@@ -57,12 +57,12 @@ def parse_args():
         help="weight save frequency: int",
         metavar="<WEIGHT_SAVE_FREQUENCY>",
         type=int,
-        default=int(5e6))
+        default=int(1e5))
     parser.add_argument("--log_frequency", 
         help="log frequency: int",
         metavar="<LOG_FREQUENCY>",
         type=int,
-        default=int(1e5))
+        default=int(1e4))
     parser.add_argument("--update_frequency", 
         help="update frequency: int",
         metavar="<UPDATE_FREQUENCY>",
@@ -78,6 +78,11 @@ def parse_args():
         metavar="<LEARNING_RATE>",
         type=float,
         default=1e-6)
+    parser.add_argument("--burn_in_duration", 
+        help="start training after this many frames: int",
+        metavar="<REPLAY_START_SIZE>",
+        type=int,
+        default=int(5e4))
     parser.add_argument("--exploration_duration", 
         help="number of updates to perform before exploration decay is done: int",
         metavar="<EXPLORATION_DURATION>",
@@ -88,11 +93,6 @@ def parse_args():
         metavar="<EXPLORATION_END_RATE>",
         type=float,
         default=.05)
-    parser.add_argument("--replay_start_size", 
-        help="start training when replay memory reaches this size: int",
-        metavar="<REPLAY_START_SIZE>",
-        type=int,
-        default=int(5e4))
     parser.add_argument("--replay_max_size", 
         help="maximum replay memory size: int",
         metavar="<REPLAY_MAX_SIZE>",
