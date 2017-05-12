@@ -1,21 +1,25 @@
-"""Thin wrapper around TensorFlow logic."""
+"""
+Thin wrapper around TensorFlow logic.
+"""
+
 import tensorflow as tf
 
-
 class QNet(object):
-    """A deep network Q-approximator implemented with TensorFlow.
+    """
+    A deep network Q-approximator implemented with TensorFlow.
 
     The network is structure is fixed, aside from the output width, which depends
     on the number of actions necessary to play a given game.
     """
 
-    def __init__(self, output_width, learning_rate):
-        """Initializes the TensorFlow graph.
+    def __init__(self, state_frames, frame_height, frame_width, output_width, learning_rate):
+        """
+        Initializes the TensorFlow graph.
 
         Args:
             output_width: The number of output units.
         """
-        self.graph_in, self.graph_out = self.construct_graph(output_width)
+        self.graph_in, self.graph_out = self.construct_graph(state_frames, frame_height, frame_width, output_width)
 
         self.target_reward = tf.placeholder(tf.float32)
         self.action_idxs = tf.placeholder(tf.int32)
@@ -30,11 +34,13 @@ class QNet(object):
         self.saver = tf.train.Saver()
 
     def __del__(self):
-        """Closes the TensorFlow session, freeing resources."""
+        """
+        Closes the TensorFlow session, freeing resources."""
         self.sess.close()
 
     def compute_q(self, net_in):
-        """Forward-propagates the given input and returns the array of outputs.
+        """
+        Forward-propagates the given input and returns the array of outputs.
 
         Args:
             net_in: Image to forward-prop through the network. Must be 1x84x84x4.
@@ -45,7 +51,8 @@ class QNet(object):
         return self.sess.run(self.graph_out, feed_dict={self.graph_in:[net_in]})[0]
 
     def update(self, batch_frames, batch_actions, batch_targets):
-        """Updates the network with the given batch input/target values using RMSProp.
+        """
+        Updates the network with the given batch input/target values using RMSProp.
 
         Args:
             batch_frames: Set of Nx84x84x4 network inputs, where N is the batch size.
@@ -61,8 +68,15 @@ class QNet(object):
                 self.action_idxs:[tup for tup in enumerate(batch_actions)],
                 self.target_reward:batch_targets})[1]
     
-    def construct_graph(self, output_width, frame_height=84, frame_width=84, state_frames=4, use_pooling=False, use_dueling=False):
-        """Creates a new TensorFlow graph with predetermined structure.
+    def construct_graph(self, 
+        state_frames, 
+        frame_height, 
+        frame_width, 
+        output_width, 
+        use_pooling=False,
+        use_dueling=False):
+        """
+        Creates a new TensorFlow graph with predetermined structure.
 
         Args:
             output_width: The number of output units for the graph.
@@ -124,8 +138,12 @@ class QNet(object):
         return graph_in, graph_out
 
 
-    def _conv2d(self, data, weights, stride):
-        """Returns a TensforFlow 2D convolutional layer.
+    def _conv2d(self, 
+        data,
+        weights, 
+        stride):
+        """
+        Returns a TensforFlow 2D convolutional layer.
 
         Args:
             data: The input tensor to the convolutional layer.
@@ -137,10 +155,15 @@ class QNet(object):
         """
         return tf.nn.conv2d(data, weights, strides=[1, stride, stride, 1], padding='SAME')
 
-    def _pool(self, data, stride=2):
-        """Returns a TensforFlow pooling layer.
+    def _pool(self, 
+        data, 
+        stride=2):
+        """
+        Returns a TensforFlow pooling layer.
         Args:
             data: The input tensor to the pooling layer.
+            stride: The x and y stride for the convolution.
+
         Returns:
             The TensorFlow pooling layer.
         """

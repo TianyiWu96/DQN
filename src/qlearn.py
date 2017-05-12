@@ -1,15 +1,19 @@
-"""Interfaces for Deep Q-Network."""
+"""
+Interfaces for Deep Q-Network.
+"""
+
 import random
 import numpy as np
 import tensorflow as tf
 from collections import deque
 from scipy.misc import imresize
-
 from src.qnet import QNet
 
 
 class DeepQLearner(object):
-    """Provides wrapper around TensorFlow for Deep Q-Network."""
+    """
+    Provides wrapper around TensorFlow for Deep Q-Network.
+    """
     def __init__(self, 
         actions, 
         weight_save_path,
@@ -24,7 +28,7 @@ class DeepQLearner(object):
         exploration_duration,
         exploration_end_rate,
         replay_max_size,
-        discount,
+        discount_rate,
         action_repeat,
         state_frames,
         frame_height,
@@ -32,7 +36,8 @@ class DeepQLearner(object):
         dueling,
         pooling,
         training):
-        """Intializes the TensorFlow graph.
+        """
+        Intializes the TensorFlow graph.
 
         Args:
             actions: List of viable actions learner can make. (Must be PyGame constants.)
@@ -65,7 +70,7 @@ class DeepQLearner(object):
         self.exploration_rate = 1.
         self.exploration_end_rate = exploration_end_rate
         self.replay_max_size = replay_max_size
-        self.discount = discount
+        self.discount_rate = discount_rate
         self.action_repeat = action_repeat
         self.state_frames = state_frames
         self.frame_height = frame_height
@@ -82,7 +87,11 @@ class DeepQLearner(object):
         self.update_count = 0
 
         # Create network.
-        self.net = QNet(len(actions), self.learning_rate)
+        self.net = QNet(self.state_frames, 
+            self.frame_height, 
+            self.frame_width, 
+            len(actions), 
+            self.learning_rate)
 
         # Store all previous transitions in a deque to allow for efficient
         # popping from the front and to allow for size management.
@@ -98,7 +107,8 @@ class DeepQLearner(object):
         self.transitions = deque(maxlen=self.replay_max_size)
 
     def __normalize_frame(self, frame):
-        """Normalizes the screen array to be 84x84x1, with floating point values in
+        """
+        Normalizes the screen array to be 84x84x1, with floating point values in
         the range [0, 1].
 
         Args:
@@ -112,7 +122,8 @@ class DeepQLearner(object):
             (self.frame_height, self.frame_width, 1))
 
     def __preprocess(self, frame):
-        """Resize image, pool across color channels, and normalize pixels.
+        """
+        Resize image, pool across color channels, and normalize pixels.
 
         Args:
             frame: The frame to process.
@@ -129,7 +140,8 @@ class DeepQLearner(object):
                 axis=2)
 
     def __remember_transition(self, pre_frame, action, terminal):
-        """Returns the transition dictionary for the given data. Defer recording the
+        """
+        Returns the transition dictionary for the given data. Defer recording the
         reward and resulting state until they are observed.
 
         Args:
@@ -143,8 +155,8 @@ class DeepQLearner(object):
             'terminal': terminal})
 
     def __observe_result(self, resulting_state, reward):
-        """Records the resulting state and reward from the previous action.
-        Clips reward as necessary.
+        """
+        Records the resulting state and reward from the previous action.
 
         Args:
             resulting_state: The (preprocessed) state resulting from the previous action.
@@ -156,11 +168,13 @@ class DeepQLearner(object):
         self.transitions[-1]['state_out'] = resulting_state
 
     def __is_burning_in(self):
-        """Returns true if the network is still burning in (observing transitions)."""
+        """
+        Returns true if the network is still burning in (observing transitions)."""
         return self.iteration < self.burn_in_duration
 
     def do_explore(self):
-        """Returns true if a random action should be taken, false otherwise.
+        """
+        Returns true if a random action should be taken, false otherwise.
         Decays the exploration rate if the final exploration frame has not been reached.
         """
         if not self.__is_burning_in() and self.exploration_rate > self.exploration_end_rate:
@@ -168,7 +182,8 @@ class DeepQLearner(object):
         return random.random() < self.exploration_rate or self.__is_burning_in()
 
     def __best_action(self, frame):
-        """Returns the best action to perform.
+        """
+        Returns the best action to perform.
 
         Args:
             frame: The current (preprocessed) frame.
@@ -176,11 +191,14 @@ class DeepQLearner(object):
         return self.actions[np.argmax(self.net.compute_q(frame))]
 
     def __random_action(self):
-        """Returns a random action to perform."""
+        """
+        Returns a random action to perform.
+        """
         return self.actions[int(random.random() * len(self.actions))]
 
     def __compute_target_reward(self, trans):
-        """Computes the target reward for the given transition.
+        """
+        Computes the target reward for the given transition.
 
         Args:
             trans: The transition for which to compute the target reward.
@@ -190,11 +208,12 @@ class DeepQLearner(object):
         """
         target_reward = trans['reward']
         if not trans['terminal']:
-            target_reward += self.discount * np.amax(self.net.compute_q(trans['state_out']))
+            target_reward += self.discount_rate * np.amax(self.net.compute_q(trans['state_out']))
         return target_reward
 
     def step(self, frame, reward, terminal, score_ratio=None):
-        """Steps the training algorithm given the current frame and previous reward.
+        """
+        Steps the training algorithm given the current frame and previous reward.
         Assumes that the reward is a consequence of the previous action.
 
         Args:
@@ -249,7 +268,12 @@ class DeepQLearner(object):
         return [action]
 
     def __log_status(self, score_ratio=None):
-        """Print the current status of the Q-DQN."""
+        """
+        Print the current status of the Q-DQN.
+        
+        Args:
+            score_ratio: Score ratio given by the PyGamePlayer.
+        """
         print('        Iteration: %d' % self.iteration)
 
         if self.__is_burning_in() or len(self.transitions) < self.replay_max_size:
@@ -269,11 +293,15 @@ class DeepQLearner(object):
         open(self.log_path, "a").write(str(score_ratio) + '\n')
 
     def __save(self):
-        """Save the current network parameters in the checkpoint path."""
+        """
+        Save the current network parameters in the checkpoint path.
+        """
         self.net.saver.save(self.net.sess, self.weight_save_path, global_step=self.iteration)
 
     def __restore(self):
-        """Restore the network from the checkpoint path."""
+        """
+        Restore the network from the checkpoint path.
+        """
         if not os.path.exists(self.weight_restore_path):
             raise Exception('No such checkpoint path %s!' % self.weight_restore_path)
 
