@@ -12,7 +12,12 @@ class QNet(object):
     on the number of actions necessary to play a given game.
     """
 
-    def __init__(self, state_frames, frame_height, frame_width, output_width, learning_rate):
+    def __init__(self, 
+        state_frames, 
+        frame_height, 
+        frame_width, 
+        output_width, 
+        learning_rate):
         """
         Initializes the TensorFlow graph.
 
@@ -138,10 +143,7 @@ class QNet(object):
         return graph_in, graph_out
 
 
-    def _conv2d(self, 
-        data,
-        weights, 
-        stride):
+    def _conv2d(self, data, weights, stride):
         """
         Returns a TensforFlow 2D convolutional layer.
 
@@ -155,9 +157,7 @@ class QNet(object):
         """
         return tf.nn.conv2d(data, weights, strides=[1, stride, stride, 1], padding='SAME')
 
-    def _pool(self, 
-        data, 
-        stride=2):
+    def _pool(self, data, stride=2):
         """
         Returns a TensforFlow pooling layer.
         Args:

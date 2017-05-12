@@ -53,11 +53,6 @@ class DeepQLearner(object):
         self.weight_save_path = weight_save_path
         self.weight_restore_path = weight_restore_path
         self.log_path = log_path
-        if self.weight_restore_path: 
-            try: self.__restore() 
-            except: pass
-        if self.log_path: 
-            open(self.log_path, 'w').close()
 
         # Save training parameters.
         self.weight_save_frequency = weight_save_frequency
@@ -92,6 +87,13 @@ class DeepQLearner(object):
             self.frame_width, 
             len(actions), 
             self.learning_rate)
+
+        # Restore weights if needed.
+        if self.weight_restore_path: 
+            try: self.__restore() 
+            except: pass
+        if self.log_path: 
+            open(self.log_path, 'w').close()
 
         # Store all previous transitions in a deque to allow for efficient
         # popping from the front and to allow for size management.
@@ -211,7 +213,11 @@ class DeepQLearner(object):
             target_reward += self.discount_rate * np.amax(self.net.compute_q(trans['state_out']))
         return target_reward
 
-    def step(self, frame, reward, terminal, score_ratio=None):
+    def step(self, 
+        frame, 
+        reward, 
+        terminal, 
+        score_ratio=None):
         """
         Steps the training algorithm given the current frame and previous reward.
         Assumes that the reward is a consequence of the previous action.
