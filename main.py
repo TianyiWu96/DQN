@@ -2,9 +2,9 @@ import os
 from argparse import ArgumentParser, ArgumentTypeError
 
 # Import players
-from players.pong_player import PongPlayer
-from players.half_pong_player import HalfPongPlayer
-from players.tetris_player import TetrisPlayer
+from src.players.pong_player import PongPlayer
+from src.players.half_pong_player import HalfPongPlayer
+from src.players.tetris_player import TetrisPlayer
 
 def main():
     games = ("pong", "half_pong", "tetris")
@@ -54,11 +54,11 @@ def parse_args(games):
     parser.add_argument("--data_path", 
         help="path for data like images, logs, weights", 
         metavar="<DATA_PATH>",
-        default="./DQN/data/")
+        default="./src/data/")
     parser.add_argument("--weight_save_path", 
         help="path for weight saving", 
         metavar="<CHECKPOINT_PATH>",
-        default="./DQN/data/model_weights/")
+        default="./src/data/model_weights/")
     parser.add_argument("--weight_restore_path", 
         help="path for weights to restore",
         metavar="RESTORE_PATH>",
@@ -66,7 +66,7 @@ def parse_args(games):
     parser.add_argument("--log_path",
         help="path for log file", 
         metavar="<LOG_PATH>",
-        default="./DQN/data/log.txt")
+        default="./src/data/log.txt")
     parser.add_argument("--weight_save_frequency", 
         help="weight save frequency: int",
         metavar="<WEIGHT_SAVE_FREQUENCY>",

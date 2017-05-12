@@ -5,7 +5,7 @@ import tensorflow as tf
 from collections import deque
 from scipy.misc import imresize
 
-from DQN.qnet import QNet
+from src.qnet import QNet
 
 
 class DeepQLearner(object):
@@ -164,7 +164,7 @@ class DeepQLearner(object):
         Decays the exploration rate if the final exploration frame has not been reached.
         """
         if not self.__is_burning_in() and self.exploration_rate > self.exploration_end_rate:
-            self.exploration_rate = max(self.exploration_end_rate, (self.exploration_duration - self.iteration / self.update_frequency / self.action_repeat) / (self.exploration_duration))
+            self.exploration_rate = max(self.exploration_end_rate, (self.exploration_duration - self.update_count) / (self.exploration_duration))
         return random.random() < self.exploration_rate or self.__is_burning_in()
 
     def __best_action(self, frame):
