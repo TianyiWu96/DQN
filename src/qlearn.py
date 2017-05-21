@@ -98,13 +98,13 @@ class DeepQLearner(object):
         # Store all previous transitions in a deque to allow for efficient
         # popping from the front and to allow for size management.
         #
-        # Transitions are dictionaries of the form below.
+        # Transitions are dictionaries of the following form:
         #     {
-        #         'state_in': The Q-network input at this point in time.
+        #         'state_in': The Q-network input state of this instance.
         #         'action': The action index (indices) taken at this frame.
         #         'reward': The reward from this action.
         #         'terminal': True if the action led to a terminal state.
-        #         'state_out': The state resulting from the given action.
+        #         'state_out': The state resulting from the transition action and initial state.
         #     }
         self.transitions = deque(maxlen=self.replay_max_size)
 
@@ -174,7 +174,7 @@ class DeepQLearner(object):
         Returns true if the network is still burning in (observing transitions)."""
         return self.iteration < self.burn_in_duration
 
-    def do_explore(self):
+    def __do_explore(self):
         """
         Returns true if a random action should be taken, false otherwise.
         Decays the exploration rate if the final exploration frame has not been reached.
@@ -262,7 +262,7 @@ class DeepQLearner(object):
                 self.net.update(batch_frames, batch_actions, batch_targets)
 
         # Select the next action.
-        action = self.__random_action() if self.do_explore() else self.__best_action(proc_frame)
+        action = self.__random_action() if self.__do_explore() else self.__best_action(proc_frame)
         self.actions_taken += 1
 
         # Remember the action and the input frames, reward to be observed later.
