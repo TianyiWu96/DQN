@@ -2,7 +2,7 @@ Deep Q-network for game playing using PyGamePlayer.
 
 ### Requirements
 
-tensorflow-gpu, scipy, numpy, pygame
+python3, tensorflow-gpu, scipy, numpy, pygame
 
 
 ### Usage
