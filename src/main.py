@@ -4,9 +4,9 @@ Main file for running the deep Q-network.
 
 import os
 from argparse import ArgumentParser, ArgumentTypeError
-from src.players.pong_player import PongPlayer
-from src.players.half_pong_player import HalfPongPlayer
-from src.players.tetris_player import TetrisPlayer
+from players.pong_player import PongPlayer
+from players.half_pong_player import HalfPongPlayer
+from players.tetris_player import TetrisPlayer
 
 def main():
     games = ("pong", "half_pong", "tetris")
@@ -54,16 +54,16 @@ def parse_args(games):
         default="pong")
     parser.add_argument("--data_path", 
         help="path for data like images, logs, weights", 
-        default="./src/data/")
+        default="./data/")
     parser.add_argument("--weight_save_path", 
         help="path for weight saving", 
-        default="./src/data/model_weights/")
+        default="./data/model_weights/")
     parser.add_argument("--weight_restore_path", 
         help="path for weights to restore",
         default=False)
     parser.add_argument("--log_path",
         help="path for log file", 
-        default="./src/data/log.txt")
+        default="./data/log.txt")
     parser.add_argument("--weight_save_frequency", 
         help="weight save frequency: int",
         type=int,

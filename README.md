@@ -7,7 +7,7 @@ tensorflow-gpu, scipy, numpy, pygame
 
 ### Usage
 ```
-usage: main.py [-h] [--game GAME] [--data_path DATA_PATH]
+usage: python3 src/main.py [-h] [--game GAME] [--data_path DATA_PATH]
                [--weight_save_path WEIGHT_SAVE_PATH]
                [--weight_restore_path WEIGHT_RESTORE_PATH]
                [--log_path LOG_PATH]

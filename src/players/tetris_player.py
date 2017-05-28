@@ -1,7 +1,7 @@
 import pygame.constants as pgc
-from src.players.pygame_player import PyGamePlayer, function_intercept
-import src.games.tetris
-from src.qlearn import DeepQLearner
+from players.pygame_player import PyGamePlayer, function_intercept
+import games.tetris
+from qlearn import DeepQLearner
 
 
 ACTIONS = [pgc.K_UNKNOWN, pgc.K_RIGHT, pgc.K_LEFT, pgc.K_DOWN, pgc.K_UP]
@@ -81,7 +81,7 @@ class TetrisPlayer(PyGamePlayer):
         
     def get_feedback(self):
     	if self._terminal :
-            from src.games.tetris import blankSpaces
+            from games.tetris import blankSpaces
             terminal = self._terminal
             
             # found the follwoing reward/penalty strategy in a paper. coeff is taken from the paper. Should play around with it a little

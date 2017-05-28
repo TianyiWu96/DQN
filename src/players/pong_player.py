@@ -1,7 +1,7 @@
 """Simple Pong Player for testing Deep Q logic."""
-from src.players.pygame_player import PyGamePlayer
+from players.pygame_player import PyGamePlayer
 from pygame.constants import K_DOWN, K_UP, K_UNKNOWN
-from src.qlearn import DeepQLearner
+from qlearn import DeepQLearner
 
 # Possible actions for Pong. Last one is equivalent to "do nothing."
 ACTIONS = [K_DOWN, K_UNKNOWN, K_UP]
@@ -77,7 +77,7 @@ class PongPlayer(PyGamePlayer):
     def get_feedback(self):
         # import must be done here because otherwise importing would cause the game to start playing
         if SCORING_FUNCTION == 'SCORES':
-            from src.games.pong import bar1_score, bar2_score
+            from games.pong import bar1_score, bar2_score
 
             # get the difference in score between this and the last run
             score_change = (bar1_score - self.last_bar1_score) - (bar2_score - self.last_bar2_score)
@@ -85,7 +85,7 @@ class PongPlayer(PyGamePlayer):
             self.last_bar2_score = bar2_score
 
         elif SCORING_FUNCTION == 'HITS':
-            from src.games.pong import hit_count, miss_count
+            from games.pong import hit_count, miss_count
 
             # get the difference in score between this and the last run
             score_change = (hit_count - self.last_hit_count) - (miss_count - self.last_miss_count)
@@ -102,4 +102,4 @@ class PongPlayer(PyGamePlayer):
 
     def start(self):
         super(PongPlayer, self).start()
-        import src.games.pong
+        import games.pong

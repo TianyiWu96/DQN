@@ -1,7 +1,7 @@
 """Implementation of PyGamePlayer for Half Pong."""
-from src.players.pygame_player import PyGamePlayer
+from players.pygame_player import PyGamePlayer
 from pygame.constants import K_DOWN, K_UP, K_UNKNOWN
-from src.qlearn import DeepQLearner
+from qlearn import DeepQLearner
 
 ACTIONS = [K_DOWN, K_UNKNOWN, K_UP]
 
@@ -73,7 +73,7 @@ class HalfPongPlayer(PyGamePlayer):
         See parent class function.
         """
         # import must be done here because otherwise importing would cause the game to start playing
-        from src.games.half_pong import hit_count, miss_count
+        from games.half_pong import hit_count, miss_count
 
         # get the difference in score between this and the last run
         score_change = (hit_count - self.last_hit_count) - (miss_count - self.last_miss_count)
@@ -90,4 +90,4 @@ class HalfPongPlayer(PyGamePlayer):
 
     def start(self):
         super(HalfPongPlayer, self).start()
-        import src.games.half_pong
+        import games.half_pong

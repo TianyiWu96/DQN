@@ -7,7 +7,7 @@ import numpy as np
 import tensorflow as tf
 from collections import deque
 from scipy.misc import imresize
-from src.qnet import QNet
+from qnet import QNet
 
 
 class DeepQLearner(object):
