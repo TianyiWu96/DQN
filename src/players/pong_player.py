@@ -3,6 +3,8 @@ from players.pygame_player import PyGamePlayer
 from pygame.constants import K_DOWN, K_UP, K_UNKNOWN
 from qlearn import DeepQLearner
 
+
+
 # Possible actions for Pong. Last one is equivalent to "do nothing."
 ACTIONS = [K_DOWN, K_UNKNOWN, K_UP]
 

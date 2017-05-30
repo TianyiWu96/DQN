@@ -3,6 +3,9 @@ from players.pygame_player import PyGamePlayer
 from pygame.constants import K_DOWN, K_UP, K_UNKNOWN
 from qlearn import DeepQLearner
 
+
+
+
 ACTIONS = [K_DOWN, K_UNKNOWN, K_UP]
 
 class HalfPongPlayer(PyGamePlayer):

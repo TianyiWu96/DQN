@@ -4,6 +4,7 @@ import games.tetris
 from qlearn import DeepQLearner
 
 
+
 ACTIONS = [pgc.K_UNKNOWN, pgc.K_RIGHT, pgc.K_LEFT, pgc.K_DOWN, pgc.K_UP]
 
 class TetrisPlayer(PyGamePlayer):

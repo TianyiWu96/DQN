@@ -5,6 +5,7 @@ import pygame.surfarray
 import pygame.key
 
 
+
 def function_intercept(intercepted_func, intercepting_func):
     """
     Intercepts a method call and calls the supplied intercepting_func with the result of it's call and it's arguments

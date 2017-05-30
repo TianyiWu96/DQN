@@ -8,10 +8,9 @@ from players.pong_player import PongPlayer
 from players.half_pong_player import HalfPongPlayer
 from players.tetris_player import TetrisPlayer
 
-def main():
-    games = ("pong", "half_pong", "tetris")
-    args = parse_args(games)
 
+
+def main(args):
     # Make data directories.
     for path in (args.data_path, args.weight_save_path, args.log_path):
         if not os.path.exists(os.path.dirname(path)):
@@ -20,8 +19,7 @@ def main():
     players = {
         "pong": PongPlayer,
         "half_pong": HalfPongPlayer,
-        "tetris": TetrisPlayer
-    }
+        "tetris": TetrisPlayer}
 
     player = players[args.game]
 
@@ -143,6 +141,7 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
+
 if __name__ == '__main__':
-    main()
+    main(args = parse_args(("pong", "half_pong", "tetris")))
     
